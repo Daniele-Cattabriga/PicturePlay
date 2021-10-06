@@ -24,14 +24,35 @@ public class Steganographer implements Runnable {
 	public void run() {
 		int x=0;
 		int y=0;
+		ArrayList<Integer> bitsBuffer=new ArrayList<Integer>();
 		try {
 			byte[] encoding=msg.getBytes("US-ASCII");
 			BitSet bs=BitSet.valueOf(encoding);
 			for(int i=0; i< bs.length();i++) {
 				if(bs.get(i)) 
-					System.out.println(1);
+					bitsBuffer.add(1);
 					else
-						System.out.println(0);
+						bitsBuffer.add(0);
+			}
+			int injector=0;
+			int buffer=0;
+			for(int i=0; i<bitsBuffer.size();i=i+3) {
+				try {
+					buffer=(image.getRGB(x, y) & 0xFFFEFEFE);
+					injector=(bitsBuffer.get(i)<< 16);
+					injector=injector | (bitsBuffer.get(i+1)<<8);
+					injector=injector | bitsBuffer.get(i+2);
+					injector=injector |buffer;
+					image.setRGB(x, y, injector);
+					x++;
+					if (x==image.getWidth()) {
+						x=0;
+						y++;
+					}
+				} catch (ArrayIndexOutOfBoundsException e) {
+					injector=injector |buffer;
+					image.setRGB(x, y, injector);
+				}
 			}
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
@@ -40,6 +61,16 @@ public class Steganographer implements Runnable {
 		
 			
 		
+	}
+	
+	
+	private void rgbSetter(int[] components, int x, int y) {
+		image.setRGB(x, y, 
+					(components[0]<<24)+
+					(components[1]<<16)+
+					(components[2]<<8)+
+					(components[3])
+				);
 	}
 
 }
