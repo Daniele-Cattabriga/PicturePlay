@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import exceptions.MessageDoesNotExistException;
+import tools.Utilities;
 
 import javax.imageio.ImageIO;
 public class Steganographer implements Runnable {
@@ -27,7 +28,7 @@ public class Steganographer implements Runnable {
 	
 	public void run() {
 		
-		if(args[0].compareTo("-e")==0) {
+		if(Utilities.convertOption(args[0])==1) {
 			try {
 				encoder(args[2]);
 			} catch (IOException e) {
@@ -35,7 +36,7 @@ public class Steganographer implements Runnable {
 			}
 		} else
 		{
-			if(args[0].compareTo("-d")==0) {
+			if(Utilities.convertOption(args[0])==2) {
 				try {
 					decoder();
 				} catch (MessageDoesNotExistException e) {
