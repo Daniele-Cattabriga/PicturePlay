@@ -128,7 +128,7 @@ public class Steganographer implements Runnable {
 					}
 				}
 			}
-			if((x++)==image.getWidth()) {
+			if((x++)==(image.getWidth()-1)) {
 				x=0;
 				y++;
 			}
