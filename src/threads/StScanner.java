@@ -16,13 +16,14 @@ public class StScanner implements Runnable {
 		startFolder=new File(args[1]);
 		if(!startFolder.exists()||!startFolder.isDirectory()||args.length<3)
 			throw new IOException("The specified start folder does not exist or the number of arguments is too low.\n"
-					+ "Usage: PicturePlay.jar option(either -md,-me) startfolder depth [message to mass encode]");
+					+ "Usage: PicturePlay.jar option(-md,-me) startfolder depth [message to mass encode]");
 		this.args=args;
 		
 	}
 	
 	
 	public void run() {
+		
 		
 		if(Utilities.convertOption(args[0])==3) {
 			massDecode();
@@ -92,5 +93,6 @@ public class StScanner implements Runnable {
 				}
 		}
 	}
-
+	
+	
 }

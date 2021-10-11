@@ -13,6 +13,8 @@ public class Utilities {
 				return 3;
 			case "-me":
 				return 4;
+			case "-mule":
+				return 5;
 			default:
 				return 0;
 				

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
 import exceptions.MessageDoesNotExistException;
 import tools.Utilities;
@@ -30,6 +29,8 @@ public class Steganographer implements Runnable {
 		
 		if(Utilities.convertOption(args[0])==1) {
 			try {
+				if(args.length<3)
+					throw new IOException("Wrong number of arguments for encoding, message needed as third argument");
 				encoder(args[2]);
 			} catch (IOException e) {
 				System.out.println(e.getMessage());
