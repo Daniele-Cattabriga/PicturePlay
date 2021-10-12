@@ -44,53 +44,61 @@ public class StScanner implements Runnable {
 		String[] folderContents=startFolder.list();
 		for(String str: folderContents) {
 			str=startFolder.getAbsolutePath()+"/"+str;
-			if(str.substring(str.lastIndexOf(".")).compareTo("png")==0) {
-				try {
-					Thread t =new Thread(new Steganographer(new String[]{"-e", str, args[3]}));
-					t.start();
-					t.join();
-				} catch (Exception e) {
-					System.out.println(e.getMessage());
-				}
-			}
-			else
-				if((new File(str)).isDirectory() && Integer.parseInt(args[2]) != 0) {
-					try {
-						Thread t=new Thread(new StScanner(new String[]{args[0], str, String.valueOf(Integer.parseInt(args[2])-1), args[3]}));
-						t.start();
-						t.join();
-					} catch (Exception e) {
-						System.out.println(e.getMessage());
+			
+					if (Integer.parseInt(args[2]) != 0) {
+						if ((new File(str)).isDirectory() && Integer.parseInt(args[2]) != 0) {
+							try {
+								Thread t = new Thread(new StScanner(new String[] { args[0], str,
+										String.valueOf(Integer.parseInt(args[2]) - 1), args[3] }));
+								t.start();
+								t.join();
+							} catch (Exception e) {
+								System.out.println(e.getMessage());
+							}
+						} else if (str.substring(str.lastIndexOf(".")).compareTo(".png") == 0
+								&& Integer.parseInt(args[2]) != 0) {
+							try {
+								Thread t = new Thread(new Steganographer(new String[] { "-e", str, args[3] }));
+								t.start();
+								t.join();
+							} catch (Exception e) {
+								System.out.println(e.getMessage());
+							}
+						} 
 					}
-				}
+				
 		}
 		
 	}
 	
 	private void massDecode() {
-
 		String[] folderContents=startFolder.list();
 		for(String str: folderContents) {
 			str=startFolder.getAbsolutePath()+"/"+str;
-			if(str.substring(str.lastIndexOf(".")).compareTo("png")==0) {
-				try {
-					Thread t =new Thread(new Steganographer(new String[]{"-d", str}));
-					t.start();
-					t.join();
-				} catch (Exception e) {
-					System.out.println(e.getMessage());
+				if (Integer.parseInt(args[2]) != 0) {
+					if ((new File(str)).isDirectory() && Integer.parseInt(args[2]) != 0) {
+						try {
+							Thread t = new Thread(new StScanner(
+									new String[] { args[0], str, String.valueOf(Integer.parseInt(args[2]) - 1) }));
+							t.start();
+							t.join();
+						} catch (Exception e) {
+							System.out.println(e.getMessage());
+						}
+					} else {
+						if (str.substring(str.lastIndexOf(".")).compareTo(".png") == 0) {
+							try {
+								Thread t = new Thread(new Steganographer(new String[] { "-d", str }));
+								t.start();
+								t.join();
+							} catch (Exception e) {
+								System.out.println(e.getMessage());
+							}
+						}
+
+					} 
 				}
-			}
-			else
-				if((new File(str)).isDirectory() && Integer.parseInt(args[2]) != 0) {
-					try {
-						Thread t=new Thread(new StScanner(new String[]{args[0], str, String.valueOf(Integer.parseInt(args[2])-1)}));
-						t.start();
-						t.join();
-					} catch (Exception e) {
-						System.out.println(e.getMessage());
-					}
-				}
+			
 		}
 	}
 	

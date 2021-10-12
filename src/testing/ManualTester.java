@@ -33,6 +33,12 @@ public class ManualTester {
 				catch(Exception e) {
 				System.out.println(e.getMessage());
 				}
+				
+			}
+			else {
+				System.out.println("Wrong number of arguments or wrong option\n"
+						+ "Usage: PicturePlay.jar option(-e, -d, -me, -md, -mule) startfolder|targeted-file(depends on option) [depth](for -me and -md) [message{0...n}](for encoding options)");
+				System.exit(1);
 			}
 		
 	}

@@ -57,7 +57,7 @@ public class Steganographer implements Runnable {
 		int y=0;
 		int injector=0;
 		int buffer=0;
-		
+		System.out.println("Encoding...");
 		msg="msg"+msg+"\0";
 		if (msg.length() * 8 > (image.getWidth() * image.getHeight() * 3)) {
 			throw new IOException("Image too small, message can't be encrypted in it\n");
@@ -109,7 +109,7 @@ public class Steganographer implements Runnable {
 		int x=(("msg".length()*8)/3);
 		int y=0;
 		byte[] buffer;
-		
+		System.out.println("Decoding...");
 		if(!checkForMessageExistance())
 			throw new MessageDoesNotExistException("Nella foto selezionata non è presente un messaggio codificato da questo steganografo\n");
 		
