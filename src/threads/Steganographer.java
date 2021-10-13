@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import exceptions.MessageDoesNotExistException;
 import tools.Utilities;
+import exceptions.IllegalNumberOfArgumentsException;
+import exceptions.ImageSizeException;
 
 import javax.imageio.ImageIO;
 public class Steganographer implements Runnable {
@@ -14,15 +16,16 @@ public class Steganographer implements Runnable {
 	private File imageFile;
 	private BufferedImage image;
 	private String[] args;
-	public Steganographer(String[] args) throws IOException {
+	public Steganographer(String[] args) throws IllegalNumberOfArgumentsException, IOException {
 		
-			if (args.length==2 || args.length==3) {
+			if (args.length>1) {
 				this.imageFile=new File(args[1]);
 				this.image = ImageIO.read(imageFile);
 				this.args=args;
 			}
 			else
-				throw new IOException("Wrong number of arguments, usage: argument vector with option, imgpath, [message to encode]");
+				throw new IllegalNumberOfArgumentsException("Wrong number of arguments\n"
+						+ Utilities.printUsage());
 	}
 	
 	public void run() {
@@ -30,9 +33,10 @@ public class Steganographer implements Runnable {
 		if(Utilities.convertOption(args[0])==1) {
 			try {
 				if(args.length<3)
-					throw new IOException("Wrong number of arguments for encoding, message needed as third argument");
+					throw new IllegalNumberOfArgumentsException("Wrong number of arguments for encoding\n"
+							+ Utilities.printUsage());
 				encoder(args[2]);
-			} catch (IOException e) {
+			} catch (Exception e) {
 				System.out.println(e.getMessage());
 			}
 		} else
@@ -44,15 +48,14 @@ public class Steganographer implements Runnable {
 					System.out.println(e.getMessage());
 				}
 			}
-			else
-				System.out.println("Wrong option, options supported are: -e for encoding, -p for decoding");
+			
 		}
 		
 		
 		
 	}
 	
-	private void encoder(String msg) throws IOException {
+	private void encoder(String msg) throws ImageSizeException, IOException {
 		int x=0;
 		int y=0;
 		int injector=0;
@@ -60,7 +63,7 @@ public class Steganographer implements Runnable {
 		System.out.println("Encoding...");
 		msg="msg"+msg+"\0";
 		if (msg.length() * 8 > (image.getWidth() * image.getHeight() * 3)) {
-			throw new IOException("Image too small, message can't be encrypted in it\n");
+			throw new ImageSizeException("Image too small, message can't be encrypted in it\n");
 		}
 		ArrayList<Integer> bitsBuffer=new ArrayList<Integer>();
 		try {
@@ -111,7 +114,7 @@ public class Steganographer implements Runnable {
 		byte[] buffer;
 		System.out.println("Decoding...");
 		if(!checkForMessageExistance())
-			throw new MessageDoesNotExistException("Nella foto selezionata non è presente un messaggio codificato da questo steganografo\n");
+			throw new MessageDoesNotExistException("In the chosen picture there isn't any message encoded by this steganograph\n");
 		
 		while(curDecoded.compareTo("\0")!=0) {
 			buffer=decompiler(image.getRGB(x, y));

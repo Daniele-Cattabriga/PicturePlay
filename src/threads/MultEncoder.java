@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import exceptions.IllegalNumberOfArgumentsException;
+import tools.Utilities;
 public class MultEncoder implements Runnable {
 
 	private String[] args;
@@ -12,9 +13,9 @@ public class MultEncoder implements Runnable {
 	private String currentFolder;
 	
 	public MultEncoder(String[] args) throws IllegalNumberOfArgumentsException {
-		if (args.length<4)
-			throw new IllegalNumberOfArgumentsException("Not enough arguments, at least 4 required.\n"
-					+ "Usage: PicturePlay.jar option startfolder|file (depends on option) [depth] [message 1...n] ");
+		if (args.length<3)
+			throw new IllegalNumberOfArgumentsException("Not enough arguments, at least 3 required.\n"
+					+ Utilities.printUsage());
 		this.args=args;
 		messagesLeft=Arrays.copyOfRange(args, 2, args.length).length;
 		this.currentTurn=0;
@@ -29,7 +30,6 @@ public class MultEncoder implements Runnable {
 		int i= args.length-messagesLeft;
 		for(String f: contents) {
 			if(messagesLeft!=0){
-				System.out.println(new File(currentFolder+File.separator+f).getName());
 				if(new File(currentFolder+File.separator+f).isDirectory()) {
 					folders.add(f);
 				}

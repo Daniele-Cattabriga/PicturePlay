@@ -20,4 +20,8 @@ public class Utilities {
 				
 		}
 	}
+	
+	public static String printUsage() {
+		return "Usage: PicturePlay.jar option(-e, -d, -me, -md, -mule) startfolder|targeted-file(depends on option) [depth](for -me and -md) [message{0...n}](for encoding options)";
+	}
 }
