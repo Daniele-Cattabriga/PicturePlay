@@ -5,11 +5,29 @@ import java.io.IOException;
 
 import exceptions.IllegalNumberOfArgumentsException;
 import tools.Utilities;
+
+
+/**
+ * This class scans the folder tree from the start folder and performs a mass encoding or decoding function, depending on the
+ * option chosen.
+ * 
+ * @author Daniele Cattabriga
+ * @version 1.0
+ * @since 16-10-2021
+ * @param args Arguments passed by terminal.
+ * @param startFolder Starting folder 
+ */
 public class StScanner implements Runnable {
 	// first arg is the option, second arg is the start folder, third arg ONLY FOR MASS ENCODING, message
 	
 	private String[] args;
 	private File startFolder;
+	
+	/**
+	 * Standard constructor of StScanner, checks if there are enough arguments to function.
+	 * @exception IOException Standard input/output exception.
+	 * @exception IllegalNumberOfArgumentsException Exception thrown when the number of arguments is too low to function.
+	 */
 	
 	public StScanner(String[] args) throws IOException, IllegalNumberOfArgumentsException
 	{
@@ -26,6 +44,7 @@ public class StScanner implements Runnable {
 		
 	}
 	
+	/** Override of the method run fron java.lang.Runnable, activates the required service*/
 	
 	public void run() {
 		try {
@@ -38,6 +57,13 @@ public class StScanner implements Runnable {
 		}
 	}
 	
+	
+	/** 
+	 * Encodes the folder tree png files with the argument message, keeps running until the tree is completely traversed or the depth is reached.
+	 * 
+	 * @param folderContents the contents of the targeted folder
+	 * @exception IllegalNumberOfArgumentsException Exception thrown when the number of arguments is too low to function.
+	 */
 	private void massEncode() throws IllegalNumberOfArgumentsException {
 		
 		if(args.length<4)
@@ -59,6 +85,12 @@ public class StScanner implements Runnable {
 				
 		}
 		
+	/** 
+	 * Decodes the folder tree png files, keeps running until the tree is completely traversed or the depth is reached.
+	 * 
+	 * @param folderContents the contents of the targeted folder
+	 * @exception IllegalNumberOfArgumentsException Exception thrown when the number of arguments is too low to function.
+	 */
 	
 	
 	private void massDecode() throws IllegalNumberOfArgumentsException {
@@ -78,6 +110,14 @@ public class StScanner implements Runnable {
 			
 		}
 	
+	/** 
+	 * Analyzes the file path passed and returns whether it's a folder or a file, if it's a folder it starts another thread onto that folder.
+	 * 
+	 * 
+	 * @param file The file to check.
+	 * @param argsTP Arguments to pass to the new thread.
+	 * @return <b>boolean</b> Returns whether the file is a folder or not.
+	 */
 	
 	private boolean iterator(String file, String[] argsTP){
 		if ((new File(file)).isDirectory() && Integer.parseInt(args[2]) != 0) {
@@ -94,6 +134,14 @@ public class StScanner implements Runnable {
 		else
 			return false;
 	}
+	
+	/** 
+	 * Analyzes the file path passed and, if it is a png file, runs a Steganographer on it
+	 * 
+	 * 
+	 * @param file The file to check.
+	 * @param argsTP Arguments to pass to the new thread.
+	 */
 	
 	private void stegCall(String file, String[] argsTP) {
 		 if (file.substring(file.lastIndexOf(".")).compareTo(".png") == 0

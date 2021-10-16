@@ -11,11 +11,57 @@ import exceptions.IllegalNumberOfArgumentsException;
 import exceptions.ImageSizeException;
 
 import javax.imageio.ImageIO;
+/**
+ * <p>
+ * This class represents a practice implementation of a steganographer using threads.
+ * It encodes messages by this format: prefix+message+\0, where the prefix is the string
+ * "msg".
+ * This prefix is inserted in the first 8 rgb pixels of the chosen picture and checked for
+ * when the decode method is called on said picture.
+ * </p>
+ * <p>
+ * In order to inject the new bits in the rgb of the picture, first off the object checks
+ * for adequate size, then it produces an injector integer composed by binary sum by the bits
+ * of the message characters shifted depending on their position in the original message
+ * (for example, 01011011, 0 is shifted by 16, 1 by 8, 1 isn't, and repeat for the next 3 bits
+ * in the next pixel), which is then binary summed to the original rgb value masked by a
+ * constant used to clear the values of the last red, green and blue bits.
+ * This new value is then setted in the targeted pixel position and the picture is updated.
+ * </p>
+ * <p>
+ * The decoding process is essentially the same, but in reverse.
+ * </p>
+ * <p>
+ * Finally, by implementing runnable we can instantiate the class as a thread, which allows for
+ * proper, simultaneous picture injection and extraction if a proper background structure is 
+ * erected.
+ * </p>
+ * 
+ * @author Daniele Cattabriga
+ * @version 1.0
+ * @since 16-10-2021
+ * @param imageFile File attribute describing the currently targeted picture.
+ * @param image The targeted image loaded as an editable object.
+ * @param args The arguments passed by terminal.
+ *
+ */
 public class Steganographer implements Runnable {
 
 	private File imageFile;
 	private BufferedImage image;
 	private String[] args;
+	
+	/**
+	 * This is the standard constructor of the Steganographer class, it checks whether the 
+	 * number of passed arguments is correct, then it prepares the picture for edits.
+	 * 
+	 * @param args Array of arguments passed by terminal.
+	 * @exception IllegalNumberOfArgumentException This exception is thrown when the number of arguments 
+	 * passed aren't enough for the proper function of even just the decoder.
+	 * @exception IOException This exception is the standard thrown exception from the ImageIO
+	 * methods. It is re-thrown for upper level management.
+	 */
+	
 	public Steganographer(String[] args) throws IllegalNumberOfArgumentsException, IOException {
 		
 			if (args.length>1) {
@@ -27,6 +73,14 @@ public class Steganographer implements Runnable {
 				throw new IllegalNumberOfArgumentsException("Wrong number of arguments\n"
 						+ Utilities.printUsage());
 	}
+	
+	/**
+	 * Implementation of the run method from java.lang.Runnable interface.
+	 * 
+	 * @exception IllegalNumberOfArgumentsException Internally thrown exception, same as constructor,
+	 * but with tighter requests for the usage of the encoder.
+	 *  
+	 */
 	
 	public void run() {
 		
@@ -54,6 +108,21 @@ public class Steganographer implements Runnable {
 		
 		
 	}
+	
+	/**
+	 * This method encodes a message in the chosen picture, first by masking the original lower bits values
+	 * with 0, clearing them, followed by the new bits injection (sequential injection, since 8 mod 3 != 0
+	 * compartmentalization isn't possible) and picture update.
+	 * 
+	 * @param msg Message to encode.
+	 * @param x X coordinate of the picture.
+	 * @param y Y coordinate of the picture.
+	 * @param injector Buffer for the 3 bits to inject in the pixel currently targeted by x and y
+	 * @param buffer Buffer for the masked picture.
+	 * @exception ImageSizeException Thrown when the size of the picture isn't large enough to
+	 * accomodate the message to be encoded.
+	 * @exception IOException Standard input-output exception.
+	 */
 	
 	private void encoder(String msg) throws ImageSizeException, IOException {
 		int x=0;
@@ -104,9 +173,25 @@ public class Steganographer implements Runnable {
 		}
 	}
 	
+	/**
+	 * This method reverses the operation performed by the encoder, and prints out 
+	 * the message encoded in the picture. It can only read messages encoded by this 
+	 * Steganograph, if the required prefix is missing, the message will be registered as nonexistent.
+	 * 
+	 * @param curDecoded Character currently decoded, it is added recursively to the complete string.
+	 * It is also used as a check for the decoding loop, once this parameter value equals the string terminator character
+	 * value it ends the decoding loop.
+	 * @param completeString Complete string decoded from the picture.
+	 * @param byteArray Bits to be parsed in a character.
+	 * @exception MessageDoesNotExistException Thrown when the decoder doesn't detect
+	 * a message encoded by this Steganographer.
+	 *  
+	 */
+	
 	private void decoder() throws MessageDoesNotExistException {
 		String curDecoded="enable";
 		String completeString="";
+		// for ease of use, next version might turn in array of length 8
 		ArrayList<Byte> byteArray=new ArrayList<Byte>();
 		int j=0;
 		int x=(("msg".length()*8)/3);
@@ -148,6 +233,15 @@ public class Steganographer implements Runnable {
 	// converting byte to bit takes the eigth, unexisting, 0
 	// from the ASCII-US format
 	
+	/**
+	 * This method decodes the first 8 pixels checking for the presence of an encoded message.
+	 * 
+	 * @param complete Result of the decoding.
+	 * @param buffer Bits to be decoded.
+	 * @param buffer2 Bits produced by the pixel decompiler.
+	 * @return <b>boolean</b> True if a message is present, false if it isn't.
+	 */
+	
 	private Boolean checkForMessageExistance() {
 		String complete="";
 		ArrayList<Byte> buffer=new ArrayList<Byte>();
@@ -164,7 +258,6 @@ public class Steganographer implements Runnable {
 						i=0;
 						buffer.clear();
 					} catch (UnsupportedEncodingException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 			}
@@ -178,6 +271,16 @@ public class Steganographer implements Runnable {
 			return false;
 		
 	}
+	
+	
+	/**
+	 * This method generates a character from bits passed as argument and returns it.
+	 * 
+	 *  @param toConvert Array of bits to encode in a character.
+	 *  @param buffer Buffer containing the complete value to encode.
+	 *  @exception UnsupportedEncodingException Standard encoding exception.
+	 *  @return <b>String</b> Generated character, packaged as string.
+	 */
 	
 	private String stringParser(ArrayList<Byte> toConvert) throws UnsupportedEncodingException {
 		int buffer=0;
@@ -196,6 +299,13 @@ public class Steganographer implements Runnable {
 		
 	}
 	
+	
+	/**
+	 * Decompiles bits from the argument rgb value.
+	 * 
+	 *  @param rgb Value to decompile.
+	 *  @return <b>result</b> Array containing decompiled bits
+	 */
 	private byte[] decompiler(int rgb) {
 		rgb=rgb &0x00010101;
 		byte[] result= new byte[3];
@@ -209,6 +319,14 @@ public class Steganographer implements Runnable {
 		}
 		return result;
 	}
+	
+	/**
+	 * Method used to in-place reverse the array in order to have it cope better with the
+	 * little-endian generation of the BitSet.valueOf method.
+	 * 
+	 * @param arr Array to flip.
+	 * @return <b>arr</b> Original array, but reversed.
+	 */
 	
 	private byte[] flipper(byte[] arr) {
 		int j=arr.length-1;
